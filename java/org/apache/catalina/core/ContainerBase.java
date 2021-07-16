@@ -889,16 +889,22 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         // Start our subordinate components, if any
         logger = null;
         getLogger();
+
+        // 集群，启动
         Cluster cluster = getClusterInternal();
         if (cluster instanceof Lifecycle) {
             ((Lifecycle) cluster).start();
         }
+
+        // 域， 启动
         Realm realm = getRealmInternal();
         if (realm instanceof Lifecycle) {
             ((Lifecycle) realm).start();
         }
 
         // Start our child containers, if any
+
+        // 找到子节点， engine->host , host->context, context->wrapper, 最后一个wrapper没有children
         Container children[] = findChildren();
         List<Future<Void>> results = new ArrayList<>();
 
@@ -907,6 +913,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
             // 启动线程
             results.add(startStopExecutor.submit(new StartChild(children[i])));
+
         }
 
         boolean fail = false;
@@ -929,6 +936,7 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         // 启动管道
         if (pipeline instanceof Lifecycle) ((Lifecycle) pipeline).start();
 
+        // 设置生命周期， 同时触发监听器 HostConfig
         setState(LifecycleState.STARTING);
 
         // Start our thread
@@ -1391,6 +1399,9 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         @Override
         public Void call() throws LifecycleException {
+
+            // 启动host, 调用的是StandardHost，
+            // 启动context ,调用的是standardContext
             child.start();
             return null;
         }
