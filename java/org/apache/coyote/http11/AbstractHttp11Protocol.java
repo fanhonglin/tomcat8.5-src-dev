@@ -858,7 +858,10 @@ public abstract class AbstractHttp11Protocol<S> extends AbstractProtocol<S> {
                 getAllowHostHeaderMismatch(), getRejectIllegalHeaderName(), getEndpoint(),
                 getMaxTrailerSize(), allowedTrailerHeaders, getMaxExtensionSize(),
                 getMaxSwallowSize(), httpUpgradeProtocols, getSendReasonPhrase());
+
+        // 设置适配器
         processor.setAdapter(getAdapter());
+
         processor.setMaxKeepAliveRequests(getMaxKeepAliveRequests());
         processor.setConnectionUploadTimeout(getConnectionUploadTimeout());
         processor.setDisableUploadTimeout(getDisableUploadTimeout());

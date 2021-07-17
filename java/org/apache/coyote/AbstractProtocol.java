@@ -847,8 +847,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
         @Override
         public SocketState process(SocketWrapperBase<S> wrapper, SocketEvent status) {
             if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("abstractConnectionHandler.process",
-                        wrapper.getSocket(), status));
+                getLog().debug(sm.getString("abstractConnectionHandler.process", wrapper.getSocket(), status));
             }
             if (wrapper == null) {
                 // Nothing to do. Socket has been closed.
@@ -859,8 +858,7 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
 
             Processor processor = connections.get(socket);
             if (getLog().isDebugEnabled()) {
-                getLog().debug(sm.getString("abstractConnectionHandler.connectionsGet",
-                        processor, socket));
+                getLog().debug(sm.getString("abstractConnectionHandler.connectionsGet", processor, socket));
             }
 
             if (processor != null) {
@@ -919,18 +917,22 @@ public abstract class AbstractProtocol<S> implements ProtocolHandler,
                     }
                 }
                 if (processor == null) {
+
+                    // 创建Processor
                     processor = getProtocol().createProcessor();
+
                     register(processor);
                 }
 
-                processor.setSslSupport(
-                        wrapper.getSslSupport(getProtocol().getClientCertProvider()));
+                processor.setSslSupport(wrapper.getSslSupport(getProtocol().getClientCertProvider()));
 
                 // Associate the processor with the connection
                 connections.put(socket, processor);
 
                 SocketState state = SocketState.CLOSED;
                 do {
+
+                    // 执行process
                     state = processor.process(wrapper, status);
 
                     if (state == SocketState.UPGRADING) {

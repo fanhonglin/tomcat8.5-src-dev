@@ -16,16 +16,15 @@
  */
 package org.apache.catalina.core;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.catalina.Host;
 import org.apache.catalina.connector.Request;
 import org.apache.catalina.connector.Response;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.res.StringManager;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 /**
  * Valve that implements the default basic behavior for the
@@ -50,7 +49,7 @@ final class StandardEngineValve extends ValveBase {
      * The string manager for this package.
      */
     private static final StringManager sm =
-        StringManager.getManager(Constants.Package);
+            StringManager.getManager(Constants.Package);
 
 
     // --------------------------------------------------------- Public Methods
@@ -60,30 +59,32 @@ final class StandardEngineValve extends ValveBase {
      * based on the requested server name.  If no matching Host can
      * be found, return an appropriate HTTP error.
      *
-     * @param request Request to be processed
+     * @param request  Request to be processed
      * @param response Response to be produced
-     *
-     * @exception IOException if an input/output error occurred
-     * @exception ServletException if a servlet error occurred
+     * @throws IOException      if an input/output error occurred
+     * @throws ServletException if a servlet error occurred
      */
     @Override
     public final void invoke(Request request, Response response)
-        throws IOException, ServletException {
+            throws IOException, ServletException {
 
         // Select the Host to be used for this Request
+
+        // 获取的是standardHost
         Host host = request.getHost();
         if (host == null) {
-            response.sendError
-                (HttpServletResponse.SC_BAD_REQUEST,
-                 sm.getString("standardEngine.noHost",
-                              request.getServerName()));
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, sm.getString("standardEngine.noHost", request.getServerName()));
             return;
         }
+
+        // 异步处理
         if (request.isAsyncSupported()) {
             request.setAsyncSupported(host.getPipeline().isAsyncSupported());
         }
 
         // Ask this Host to process this request
+
+        // standardHostValue
         host.getPipeline().getFirst().invoke(request, response);
 
     }

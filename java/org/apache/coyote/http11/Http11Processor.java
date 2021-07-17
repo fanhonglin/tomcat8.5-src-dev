@@ -800,7 +800,13 @@ public class Http11Processor extends AbstractProcessor {
             if (!getErrorState().isError()) {
                 try {
                     rp.setStage(org.apache.coyote.Constants.STAGE_SERVICE);
+
+
+                    // 执行----- adapter.service---------------
+
+
                     getAdapter().service(request, response);
+
                     // Handle when the response was committed before a serious
                     // error occurred.  Throwing a ServletException should both
                     // set the status to 500 and set the errorException.

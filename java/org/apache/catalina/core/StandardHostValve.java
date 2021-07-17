@@ -106,13 +106,15 @@ final class StandardHostValve extends ValveBase {
         throws IOException, ServletException {
 
         // Select the Context to be used for this Request
+
+        // 获取context
         Context context = request.getContext();
         if (context == null) {
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                 sm.getString("standardHost.noContext"));
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, sm.getString("standardHost.noContext"));
             return;
         }
 
+        // 异步处理
         if (request.isAsyncSupported()) {
             request.setAsyncSupported(context.getPipeline().isAsyncSupported());
         }
@@ -137,7 +139,10 @@ final class StandardHostValve extends ValveBase {
             // defined error pages.
             try {
                 if (!asyncAtStart || asyncDispatching) {
+
+                    // 执行StandardContextValve
                     context.getPipeline().getFirst().invoke(request, response);
+
                 } else {
                     // Make sure this request/response is here because an error
                     // report is required.
