@@ -589,9 +589,13 @@ public class Catalina {
             }
 
             try {
+
                 inputSource.setByteStream(inputStream);
                 digester.push(this);
+
+                // 把Standardservice设置到 Standardserver当中，依次解析server.xml的数据，反射成对象
                 digester.parse(inputSource);
+
             } catch (SAXParseException spe) {
                 log.warn("Catalina.start using " + getConfigFile() + ": " +
                         spe.getMessage());
