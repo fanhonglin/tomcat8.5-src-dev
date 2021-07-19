@@ -271,9 +271,12 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 Thread pollerThread = new Thread(pollers[i], getName() + "-ClientPoller-" + i);
                 pollerThread.setPriority(threadPriority);
                 pollerThread.setDaemon(true);
+
+                // 启动poller线程，监听队列
                 pollerThread.start();
             }
 
+            // 启动Acceptor线程，监听请求
             startAcceptorThreads();
         }
     }
@@ -496,6 +499,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                     if (running && !paused) {
                         // setSocketOptions() will hand the socket off to
                         // an appropriate processor if successful
+
                         // 设置属性
                         if (!setSocketOptions(socket)) {
                             closeSocket(socket);

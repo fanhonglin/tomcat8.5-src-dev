@@ -319,10 +319,8 @@ public final class Bootstrap {
             param = new Object[1];
             param[0] = arguments;
         }
-        Method method =
-                catalinaDaemon.getClass().getMethod(methodName, paramTypes);
-        if (log.isDebugEnabled())
-            log.debug("Calling startup class " + method);
+        Method method = catalinaDaemon.getClass().getMethod(methodName, paramTypes);
+        if (log.isDebugEnabled()) log.debug("Calling startup class " + method);
         method.invoke(catalinaDaemon, param);
 
     }
@@ -501,7 +499,9 @@ public final class Bootstrap {
         }
 
         try {
+
             String command = "start";
+
             if (args.length > 0) {
                 command = args[args.length - 1];
             }
@@ -513,7 +513,8 @@ public final class Bootstrap {
             } else if (command.equals("stopd")) {
                 args[args.length - 1] = "stop";
                 daemon.stop();
-            } else if (command.equals("start")) {
+
+            } else if (command.equals("start")) { // start
                 daemon.setAwait(true);
 
                 // Catalina.load 初始化Catalina ->  server -> service -> engine/executor/connector-> endpoint/NioEndPoint

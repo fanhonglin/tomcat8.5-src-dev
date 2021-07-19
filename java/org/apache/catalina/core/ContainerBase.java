@@ -917,6 +917,8 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
 
         boolean fail = false;
+
+        // 多线程阻塞获取结果
         for (Future<Void> result : results) {
             try {
                 result.get();

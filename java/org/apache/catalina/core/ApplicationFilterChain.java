@@ -162,6 +162,8 @@ public final class ApplicationFilterChain implements FilterChain {
                     throw new ServletException(e.getMessage(), e);
             }
         } else {
+
+            // 调用内部filter
             internalDoFilter(request, response);
         }
     }
