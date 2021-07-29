@@ -147,7 +147,10 @@ public final class Bootstrap {
 
             // tomcat 定义的3个类加载器 common/server/shared ,父类为system ClassLoader  称为：URLClassLoader
 
-            // JVM类加载器， bootstarp ClassLoader /ext ClassLoader /system ClassLoader, 双亲委派机制:查找效率不高
+            // JVM类加载器， bootstarp ClassLoader /ext ClassLoader /system ClassLoader, 双亲委派机制:查找效率不高, 并且隔离性
+            // 为了避免类冲突，每个 webapp 项目中各自使用的类库要有隔离机制
+            //不同 webapp 项目支持共享某些类库
+            //类加载器应该支持热插拔功能，比如对 jsp 的支持、webapp 的 reload 操作
 
             // common类加载器，公共的都可以使用, 打破了双亲委派机制， 他的父类为null
             commonLoader = createClassLoader("common", null);
@@ -157,9 +160,11 @@ public final class Bootstrap {
             }
 
             // server， 服务器的类加载器, 他的父类为common
+            // 默认情况下被赋值为 Common 类加载器实例
             catalinaLoader = createClassLoader("server", commonLoader);
 
             // shared， 所有的webapps(classes/lib) 的类加载器, 父类为common
+            // 默认情况下被赋值为 Common 类加载器实例
             sharedLoader = createClassLoader("shared", commonLoader);
 
         } catch (Throwable t) {
@@ -176,10 +181,12 @@ public final class Bootstrap {
     private ClassLoader createClassLoader(String name, ClassLoader parent)
             throws Exception {
 
+        // catalina.properties 当中配置的 common.loader
+        // "${catalina.base}/lib","${catalina.base}/lib/*.jar","${catalina.home}/lib","${catalina.home}/lib/*.jar"
         String value = CatalinaProperties.getProperty(name + ".loader");
         if ((value == null) || (value.equals("")))
             return parent;
-
+        // tomcat/lib目录下的jar文件
         value = replace(value);
 
         List<Repository> repositories = new ArrayList<>();
@@ -191,8 +198,7 @@ public final class Bootstrap {
             try {
                 @SuppressWarnings("unused")
                 URL url = new URL(repository);
-                repositories.add(
-                        new Repository(repository, RepositoryType.URL));
+                repositories.add(new Repository(repository, RepositoryType.URL));
                 continue;
             } catch (MalformedURLException e) {
                 // Ignore
@@ -273,6 +279,7 @@ public final class Bootstrap {
         // 初始化类加载器
         initClassLoaders();
 
+        // 设置上下文类加载器为 catalinaLoader
         Thread.currentThread().setContextClassLoader(catalinaLoader);
 
         SecurityClassLoad.securityClassLoad(catalinaLoader);
@@ -295,6 +302,7 @@ public final class Bootstrap {
         Method method = startupInstance.getClass().getMethod(methodName, paramTypes);
         method.invoke(startupInstance, paramValues);
 
+        // 为Catalina对象设置其父加载器为shared类加载器，默认情况下就是catalina类加载器
         catalinaDaemon = startupInstance;
 
     }
