@@ -831,6 +831,9 @@ public class StandardHost extends ContainerBase implements Host {
     @Override
     protected synchronized void startInternal() throws LifecycleException {
 
+
+        // Web应用加载的开始， StandardHost-> HostConfig: 扫描web部署目录-> StandardContext-> ContextConfig ： 解析web.xml, servlet定义构建wrapper-> StandardWrapper
+
         // Set error report valve
         String errorValve = getErrorReportValveClass();
 

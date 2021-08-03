@@ -242,8 +242,7 @@ public class JreMemoryLeakPreventionListener implements LifecycleListener {
             {
                 // Use the system classloader as the victim for all this
                 // ClassLoader pinning we're about to do.
-                Thread.currentThread().setContextClassLoader(
-                        ClassLoader.getSystemClassLoader());
+                Thread.currentThread().setContextClassLoader(ClassLoader.getSystemClassLoader());
 
                 /*
                  * First call to this loads all drivers in the current class

@@ -4914,7 +4914,6 @@ public class StandardContext extends ContainerBase
         // main: WEB-INF/lib   ， classes ;
         // jar
         // post
-
         if (getResources() == null) {   // (1) Required by Loader
             if (log.isDebugEnabled())
                 log.debug("Configuring default Resources");
@@ -5034,7 +5033,7 @@ public class StandardContext extends ContainerBase
 
                 // Notify our interested LifecycleListeners
 
-                // 触发ContextConfig事件
+                // 触发ContextConfig事件， web.xml， 解析servlet
                 fireLifecycleEvent(Lifecycle.CONFIGURE_START_EVENT, null);
 
                 // Start our child containers, if not already started

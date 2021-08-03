@@ -994,7 +994,7 @@ public class Connector extends LifecycleMBeanBase {
         }
 
         try {
-            // 初始化 ProtocolHandler
+            // 初始化 ProtocolHandler， protocolHander 是 digster 加载的 org.apache.coyote.http11.Http11NioProtocol
             protocolHandler.init();
         } catch (Exception e) {
             throw new LifecycleException(

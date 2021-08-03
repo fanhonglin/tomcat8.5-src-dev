@@ -450,7 +450,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
             // Loop until we receive a shutdown command
 
-            // 轮询监听请求
+            // 轮询监听请求， 自旋
             while (running) {
 
                 // Loop if endpoint is paused
@@ -1554,9 +1554,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                     // Process the request from this socket
                     if (event == null) {
 
-                        // 处理 , 获取到 hander ,调用 process方法
+
                         state = getHandler().process(socketWrapper, SocketEvent.OPEN_READ);
-                    } else {
+                    } else {// 处理 , 获取到 hander ,调用 process方法
                         state = getHandler().process(socketWrapper, event);
                     }
                     if (state == SocketState.CLOSED) {

@@ -279,7 +279,7 @@ public final class Bootstrap {
         // 初始化类加载器
         initClassLoaders();
 
-        // 设置上下文类加载器为 catalinaLoader
+        // 设置上下文类加载器为 catalinaLoader， 打破双亲委派机制
         Thread.currentThread().setContextClassLoader(catalinaLoader);
 
         SecurityClassLoad.securityClassLoad(catalinaLoader);

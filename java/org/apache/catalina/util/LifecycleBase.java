@@ -86,6 +86,8 @@ public abstract class LifecycleBase implements Lifecycle {
      */
     protected void fireLifecycleEvent(String type, Object data) {
         LifecycleEvent event = new LifecycleEvent(this, type, data);
+
+        // 触发监听事件，EngineConfig, HostConfig, ，ContextConfig
         for (LifecycleListener listener : lifecycleListeners) {
             listener.lifecycleEvent(event);
         }
@@ -99,6 +101,8 @@ public abstract class LifecycleBase implements Lifecycle {
         }
 
         try {
+
+            // before_init, 会执行server.xml server当中的监听器
             setStateInternal(LifecycleState.INITIALIZING, null, false);
 
             //执行子类的实现，比如stardardSever, StandardService
@@ -356,7 +360,8 @@ public abstract class LifecycleBase implements Lifecycle {
     }
 
     private synchronized void setStateInternal(LifecycleState state,
-                                               Object data, boolean check) throws LifecycleException {
+                                               Object data,
+                                               boolean check) throws LifecycleException {
 
         if (log.isDebugEnabled()) {
             log.debug(sm.getString("lifecycleBase.setState", this, state));
@@ -391,6 +396,8 @@ public abstract class LifecycleBase implements Lifecycle {
 
         this.state = state;
         String lifecycleEvent = state.getLifecycleEvent();
+
+        // 调用
         if (lifecycleEvent != null) {
             fireLifecycleEvent(lifecycleEvent, data);
         }

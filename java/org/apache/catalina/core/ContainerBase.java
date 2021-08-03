@@ -903,7 +903,6 @@ public abstract class ContainerBase extends LifecycleMBeanBase
         }
 
         // Start our child containers, if any
-
         // 找到子节点， engine->host , host->context, context->wrapper, 最后一个wrapper没有children
         Container children[] = findChildren();
         List<Future<Void>> results = new ArrayList<>();
@@ -929,16 +928,14 @@ public abstract class ContainerBase extends LifecycleMBeanBase
 
         }
         if (fail) {
-            throw new LifecycleException(
-                    sm.getString("containerBase.threadedStartFailed"));
+            throw new LifecycleException(sm.getString("containerBase.threadedStartFailed"));
         }
 
         // Start the Valves in our pipeline (including the basic), if any
-
         // 启动管道
         if (pipeline instanceof Lifecycle) ((Lifecycle) pipeline).start();
 
-        // 设置生命周期， 同时触发监听器 HostConfig
+        // 设置生命周期， 同时触发监听器 HostConfig -> 部署项目 deploy Descriptors、deploy WARS、deploy directories
         setState(LifecycleState.STARTING);
 
         // Start our thread

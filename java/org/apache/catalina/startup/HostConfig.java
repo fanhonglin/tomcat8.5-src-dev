@@ -294,6 +294,7 @@ public class HostConfig implements LifecycleListener {
 
             // 监听start
             start();
+
         } else if (event.getType().equals(Lifecycle.STOP_EVENT)) {
             stop();
         }
@@ -427,7 +428,6 @@ public class HostConfig implements LifecycleListener {
         deployDescriptors(configBase, configBase.list());
 
         // Deploy WARs
-
         // 部署war包
         deployWARs(appBase, filteredAppPaths);
 
@@ -530,8 +530,7 @@ public class HostConfig implements LifecycleListener {
                 if (isServiced(cn.getName()) || deploymentExists(cn.getName()))
                     continue;
 
-                results.add(
-                        es.submit(new DeployDescriptor(this, cn, contextXml)));
+                results.add(es.submit(new DeployDescriptor(this, cn, contextXml)));
             }
         }
 
@@ -539,8 +538,7 @@ public class HostConfig implements LifecycleListener {
             try {
                 result.get();
             } catch (Exception e) {
-                log.error(sm.getString(
-                        "hostConfig.deployDescriptor.threaded.error"), e);
+                log.error(sm.getString("hostConfig.deployDescriptor.threaded.error"), e);
             }
         }
     }
@@ -711,21 +709,18 @@ public class HostConfig implements LifecycleListener {
      */
     protected void deployWARs(File appBase, String[] files) {
 
-        if (files == null)
-            return;
+        if (files == null) return;
 
         ExecutorService es = host.getStartStopExecutor();
         List<Future<?>> results = new ArrayList<>();
 
         for (int i = 0; i < files.length; i++) {
 
-            if (files[i].equalsIgnoreCase("META-INF"))
-                continue;
-            if (files[i].equalsIgnoreCase("WEB-INF"))
-                continue;
+            if (files[i].equalsIgnoreCase("META-INF")) continue;
+            if (files[i].equalsIgnoreCase("WEB-INF")) continue;
+
             File war = new File(appBase, files[i]);
-            if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".war") &&
-                    war.isFile() && !invalidWars.contains(files[i])) {
+            if (files[i].toLowerCase(Locale.ENGLISH).endsWith(".war") && war.isFile() && !invalidWars.contains(files[i])) {
 
                 ContextName cn = new ContextName(files[i], true);
 
@@ -744,10 +739,7 @@ public class HostConfig implements LifecycleListener {
                         File dir = new File(appBase, cn.getBaseName());
                         if (dir.exists()) {
                             if (!app.loggedDirWarning) {
-                                log.warn(sm.getString(
-                                        "hostConfig.deployWar.hiddenDir",
-                                        dir.getAbsoluteFile(),
-                                        war.getAbsoluteFile()));
+                                log.warn(sm.getString("hostConfig.deployWar.hiddenDir", dir.getAbsoluteFile(), war.getAbsoluteFile()));
                                 app.loggedDirWarning = true;
                             }
                         } else {
@@ -759,8 +751,7 @@ public class HostConfig implements LifecycleListener {
 
                 // Check for WARs with /../ /./ or similar sequences in the name
                 if (!validateContextPath(appBase, cn.getBaseName())) {
-                    log.error(sm.getString(
-                            "hostConfig.illegalWarName", files[i]));
+                    log.error(sm.getString("hostConfig.illegalWarName", files[i]));
                     invalidWars.add(files[i]);
                     continue;
                 }
@@ -773,8 +764,7 @@ public class HostConfig implements LifecycleListener {
             try {
                 result.get();
             } catch (Exception e) {
-                log.error(sm.getString(
-                        "hostConfig.deployWar.threaded.error"), e);
+                log.error(sm.getString("hostConfig.deployWar.threaded.error"), e);
             }
         }
     }
@@ -1031,18 +1021,16 @@ public class HostConfig implements LifecycleListener {
      */
     protected void deployDirectories(File appBase, String[] files) {
 
-        if (files == null)
-            return;
+        if (files == null) return;
 
         ExecutorService es = host.getStartStopExecutor();
         List<Future<?>> results = new ArrayList<>();
 
         for (int i = 0; i < files.length; i++) {
 
-            if (files[i].equalsIgnoreCase("META-INF"))
-                continue;
-            if (files[i].equalsIgnoreCase("WEB-INF"))
-                continue;
+            if (files[i].equalsIgnoreCase("META-INF")) continue;
+            if (files[i].equalsIgnoreCase("WEB-INF")) continue;
+
             File dir = new File(appBase, files[i]);
             if (dir.isDirectory()) {
                 ContextName cn = new ContextName(files[i], false);
@@ -1058,8 +1046,7 @@ public class HostConfig implements LifecycleListener {
             try {
                 result.get();
             } catch (Exception e) {
-                log.error(sm.getString(
-                        "hostConfig.deployDir.threaded.error"), e);
+                log.error(sm.getString("hostConfig.deployDir.threaded.error"), e);
             }
         }
     }
@@ -1563,29 +1550,27 @@ public class HostConfig implements LifecycleListener {
      */
     public void start() {
 
-        if (log.isDebugEnabled())
-            log.debug(sm.getString("hostConfig.start"));
+        if (log.isDebugEnabled()) log.debug(sm.getString("hostConfig.start"));
 
         try {
             ObjectName hostON = host.getObjectName();
             oname = new ObjectName
                     (hostON.getDomain() + ":type=Deployer,host=" + host.getName());
-            Registry.getRegistry(null, null).registerComponent
-                    (this, oname, this.getClass().getName());
+            Registry.getRegistry(null, null).registerComponent(this, oname, this.getClass().getName());
         } catch (Exception e) {
             log.error(sm.getString("hostConfig.jmx.register", oname), e);
         }
 
         if (!host.getAppBaseFile().isDirectory()) {
-            log.error(sm.getString("hostConfig.appBase", host.getName(),
-                    host.getAppBaseFile().getPath()));
+            log.error(sm.getString("hostConfig.appBase", host.getName(), host.getAppBaseFile().getPath()));
             host.setDeployOnStartup(false);
             host.setAutoDeploy(false);
         }
 
-        // 部署webapp
-        if (host.getDeployOnStartup())
+        // 部署webapp, 热部署
+        if (host.getDeployOnStartup()) {
             deployApps();
+        }
 
     }
 

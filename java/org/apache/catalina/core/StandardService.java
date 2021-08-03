@@ -409,6 +409,8 @@ public class StandardService extends LifecycleMBeanBase implements Service {
     protected void startInternal() throws LifecycleException {
 
         if (log.isInfoEnabled()) log.info(sm.getString("standardService.start.name", this.name));
+
+        // 触发监听事件
         setState(LifecycleState.STARTING);
 
         // Start our defined Container first
@@ -551,7 +553,10 @@ public class StandardService extends LifecycleMBeanBase implements Service {
         // Initialize our defined Connectors
         synchronized (connectorsLock) {
 
-            // 1个service 多个 connector
+            // 1个service 多个 connector ，
+            // digster进行实例化connector时，
+            // 就会在构造当中设置protocolHandler 为 org.apache.coyote.http11.Http11NioProtocol
+            // Http11NioProtocol构造就会设置 endPoint 为： NioEndPoint
             for (Connector connector : connectors) {
                 try {
 

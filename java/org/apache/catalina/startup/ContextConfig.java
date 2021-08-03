@@ -241,7 +241,10 @@ public class ContextConfig implements LifecycleListener {
 
         // Process the event that has occurred
         if (event.getType().equals(Lifecycle.CONFIGURE_START_EVENT)) {
+
+            // 解析 web.xml , servlet
             configureStart();
+
         } else if (event.getType().equals(Lifecycle.BEFORE_START_EVENT)) {
             beforeStart();
         } else if (event.getType().equals(Lifecycle.AFTER_START_EVENT)) {
@@ -721,6 +724,7 @@ public class ContextConfig implements LifecycleListener {
                     Boolean.valueOf(context.getXmlNamespaceAware())));
         }
 
+        // web.xml
         webConfig();
 
         context.addServletContainerInitializer(new JasperInitializer(), null);
@@ -1052,6 +1056,8 @@ public class ContextConfig implements LifecycleListener {
          *   those in JARs excluded from an absolute ordering) need to be
          *   scanned to check if they match.
          */
+
+        // xml 解析器
         WebXmlParser webXmlParser = new WebXmlParser(context.getXmlNamespaceAware(),
                 context.getXmlValidation(), context.getXmlBlockExternal());
 
@@ -1082,6 +1088,7 @@ public class ContextConfig implements LifecycleListener {
 
         // Step 3. Look for ServletContainerInitializer implementations
         if (ok) {
+            // ServletContainerInitializer 的实现 比如： SpringServletContainerInitializer
             processServletContainerInitializers();
         }
 
@@ -1099,6 +1106,7 @@ public class ContextConfig implements LifecycleListener {
                     if ("META-INF".equals(webResource.getName())) {
                         continue;
                     }
+
                     processAnnotationsWebResource(webResource, webXml, webXml.isMetadataComplete(), javaClassCache);
                 }
             }
@@ -1107,6 +1115,8 @@ public class ContextConfig implements LifecycleListener {
             // @HandlesTypes matches - only need to process those fragments we
             // are going to use (remember orderedFragments includes any
             // container fragments)
+
+            // 注解方式获取servet
             if (ok) {
                 processAnnotations(orderedFragments, webXml.isMetadataComplete(), javaClassCache);
             }
@@ -1580,12 +1590,9 @@ public class ContextConfig implements LifecycleListener {
                 ht = sci.getClass().getAnnotation(HandlesTypes.class);
             } catch (Exception e) {
                 if (log.isDebugEnabled()) {
-                    log.info(sm.getString("contextConfig.sci.debug",
-                            sci.getClass().getName()),
-                            e);
+                    log.info(sm.getString("contextConfig.sci.debug", sci.getClass().getName()), e);
                 } else {
-                    log.info(sm.getString("contextConfig.sci.info",
-                            sci.getClass().getName()));
+                    log.info(sm.getString("contextConfig.sci.info", sci.getClass().getName()));
                 }
                 continue;
             }
@@ -1603,8 +1610,7 @@ public class ContextConfig implements LifecycleListener {
                 } else {
                     handlesTypesNonAnnotations = true;
                 }
-                Set<ServletContainerInitializer> scis =
-                        typeInitializerMap.get(type);
+                Set<ServletContainerInitializer> scis = typeInitializerMap.get(type);
                 if (scis == null) {
                     scis = new HashSet<>();
                     typeInitializerMap.put(type, scis);
@@ -1852,7 +1858,9 @@ public class ContextConfig implements LifecycleListener {
     }
 
     protected void processAnnotations(Set<WebXml> fragments,
-                                      boolean handlesTypesOnly, Map<String, JavaClassCacheEntry> javaClassCache) {
+                                      boolean handlesTypesOnly,
+                                      Map<String, JavaClassCacheEntry> javaClassCache) {
+
         for (WebXml fragment : fragments) {
             // Only need to scan for @HandlesTypes matches if any of the
             // following are true:

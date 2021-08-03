@@ -230,7 +230,7 @@ public final class ApplicationFilterChain implements FilterChain {
                         principal);
             } else {
 
-                // 执行 Servet.service(), 也就是 SpringMvc DispatcherServlet 的service 开始执行的地方
+                // 执行 Servlet.service(), 也就是 SpringMvc DispatcherServlet 的service 开始执行的地方
                 servlet.service(request, response);
             }
         } catch (IOException | ServletException | RuntimeException e) {
