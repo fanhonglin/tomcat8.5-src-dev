@@ -457,6 +457,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 while (paused && running) {
                     state = AcceptorState.PAUSED;
                     try {
+                        // 50ms检查一次是否是pause状态
                         Thread.sleep(50);
                     } catch (InterruptedException e) {
                         // Ignore
@@ -470,6 +471,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
                 try {
                     //if we have reached max connections, wait
+                    // 增加一个连接计数，是否达到最大连接
                     countUpOrAwaitConnection();
 
                     SocketChannel socket = null;
@@ -639,8 +641,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     public class Poller implements Runnable {
 
         private Selector selector;
-        private final SynchronizedQueue<PollerEvent> events =
-                new SynchronizedQueue<>();
+        private final SynchronizedQueue<PollerEvent> events = new SynchronizedQueue<>();
 
         private volatile boolean close = false;
         private long nextExpiration = 0;//optimize expiration handling

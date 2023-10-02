@@ -61,21 +61,20 @@ public final class ClassLoaderFactory {
      * defaults and the specified directory paths:
      *
      * @param unpacked Array of pathnames to unpacked directories that should
-     *  be added to the repositories of the class loader, or <code>null</code>
-     * for no unpacked directories to be considered
-     * @param packed Array of pathnames to directories containing JAR files
-     *  that should be added to the repositories of the class loader,
-     * or <code>null</code> for no directories of JAR files to be considered
-     * @param parent Parent class loader for the new class loader, or
-     *  <code>null</code> for the system class loader.
+     *                 be added to the repositories of the class loader, or <code>null</code>
+     *                 for no unpacked directories to be considered
+     * @param packed   Array of pathnames to directories containing JAR files
+     *                 that should be added to the repositories of the class loader,
+     *                 or <code>null</code> for no directories of JAR files to be considered
+     * @param parent   Parent class loader for the new class loader, or
+     *                 <code>null</code> for the system class loader.
      * @return the new class loader
-     *
-     * @exception Exception if an error occurs constructing the class loader
+     * @throws Exception if an error occurs constructing the class loader
      */
     public static ClassLoader createClassLoader(File unpacked[],
                                                 File packed[],
                                                 final ClassLoader parent)
-        throws Exception {
+            throws Exception {
 
         if (log.isDebugEnabled())
             log.debug("Creating new class loader");
@@ -85,7 +84,7 @@ public final class ClassLoaderFactory {
 
         // Add unpacked directories
         if (unpacked != null) {
-            for (int i = 0; i < unpacked.length; i++)  {
+            for (int i = 0; i < unpacked.length; i++) {
                 File file = unpacked[i];
                 if (!file.canRead())
                     continue;
@@ -142,15 +141,13 @@ public final class ClassLoaderFactory {
      * @param repositories List of class directories, jar files, jar directories
      *                     or URLS that should be added to the repositories of
      *                     the class loader.
-     * @param parent Parent class loader for the new class loader, or
-     *  <code>null</code> for the system class loader.
+     * @param parent       Parent class loader for the new class loader, or
+     *                     <code>null</code> for the system class loader.
      * @return the new class loader
-     *
-     * @exception Exception if an error occurs constructing the class loader
+     * @throws Exception if an error occurs constructing the class loader
      */
     public static ClassLoader createClassLoader(List<Repository> repositories,
-                                                final ClassLoader parent)
-        throws Exception {
+                                                final ClassLoader parent) throws Exception {
 
         if (log.isDebugEnabled())
             log.debug("Creating new class loader");
@@ -159,7 +156,7 @@ public final class ClassLoaderFactory {
         Set<URL> set = new LinkedHashSet<>();
 
         if (repositories != null) {
-            for (Repository repository : repositories)  {
+            for (Repository repository : repositories) {
                 if (repository.getType() == RepositoryType.URL) {
                     URL url = buildClassLoaderUrl(repository.getLocation());
                     if (log.isDebugEnabled())
@@ -176,7 +173,7 @@ public final class ClassLoaderFactory {
                         log.debug("  Including directory " + url);
                     set.add(url);
                 } else if (repository.getType() == RepositoryType.JAR) {
-                    File file=new File(repository.getLocation());
+                    File file = new File(repository.getLocation());
                     file = file.getCanonicalFile();
                     if (!validateFile(file, RepositoryType.JAR)) {
                         continue;
@@ -186,14 +183,14 @@ public final class ClassLoaderFactory {
                         log.debug("  Including jar file " + url);
                     set.add(url);
                 } else if (repository.getType() == RepositoryType.GLOB) {
-                    File directory=new File(repository.getLocation());
+                    File directory = new File(repository.getLocation());
                     directory = directory.getCanonicalFile();
                     if (!validateFile(directory, RepositoryType.GLOB)) {
                         continue;
                     }
                     if (log.isDebugEnabled())
                         log.debug("  Including directory glob "
-                            + directory.getAbsolutePath());
+                                + directory.getAbsolutePath());
                     String filenames[] = directory.list();
                     if (filenames == null) {
                         continue;
@@ -209,7 +206,7 @@ public final class ClassLoaderFactory {
                         }
                         if (log.isDebugEnabled())
                             log.debug("    Including glob jar file "
-                                + file.getAbsolutePath());
+                                    + file.getAbsolutePath());
                         URL url = buildClassLoaderUrl(file);
                         set.add(url);
                     }
@@ -237,7 +234,7 @@ public final class ClassLoaderFactory {
     }
 
     private static boolean validateFile(File file,
-            RepositoryType type) throws IOException {
+                                        RepositoryType type) throws IOException {
         if (RepositoryType.DIR == type || RepositoryType.GLOB == type) {
             if (!file.isDirectory() || !file.canRead()) {
                 String msg = "Problem with directory [" + file +
@@ -245,9 +242,9 @@ public final class ClassLoaderFactory {
                         "], isDirectory: [" + file.isDirectory() +
                         "], canRead: [" + file.canRead() + "]";
 
-                File home = new File (Bootstrap.getCatalinaHome());
+                File home = new File(Bootstrap.getCatalinaHome());
                 home = home.getCanonicalFile();
-                File base = new File (Bootstrap.getCatalinaBase());
+                File base = new File(Bootstrap.getCatalinaBase());
                 base = base.getCanonicalFile();
                 File defaultValue = new File(base, "lib");
 
