@@ -443,6 +443,8 @@ public class Tomcat {
         // Otherwise it creates a NIO HTTP connector.
         Connector connector = new Connector("HTTP/1.1");
         connector.setPort(port);
+
+        // 绑定service 和 connector 之间的关系
         service.addConnector(connector);
         defaultConnectorCreated = true;
         return connector;
@@ -497,8 +499,11 @@ public class Tomcat {
             return (Host) engine.findChildren()[0];
         }
 
+        // 实例化 StandardHost， 并设置pipeline为 StandardHostValve
         Host host = new StandardHost();
         host.setName(hostname);
+
+        // 绑定engine和host
         getEngine().addChild(host);
         return host;
     }
@@ -512,10 +517,15 @@ public class Tomcat {
         if (service.getContainer() != null) {
             return service.getContainer();
         }
+
+        // 实例化 StandardEngine，
+        // 设置  pipeline ， new StandardEngineValve()
         Engine engine = new StandardEngine();
         engine.setName( "Tomcat" );
         engine.setDefaultHost(hostname);
         engine.setRealm(createDefaultRealm());
+
+        // 绑定service 和engine
         service.setContainer(engine);
         return engine;
     }
@@ -533,14 +543,18 @@ public class Tomcat {
 
         System.setProperty("catalina.useNaming", "false");
 
+        // 实例化 StandardServer
         server = new StandardServer();
 
         initBaseDir();
 
         server.setPort( -1 );
 
+        // 实例化service
         Service service = new StandardService();
         service.setName("Tomcat");
+
+        // 绑定server和service之间的关系
         server.addService(service);
         return server;
     }

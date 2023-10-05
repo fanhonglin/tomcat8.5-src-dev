@@ -525,7 +525,15 @@ public class Catalina {
 
         // Create and execute our Digester
 
-        // 解析server.xml文件
+        // 解析server.xml文件，
+        // 实例化 Engine等
+
+        // 反射实例化 StandardServer 等
+        //         digester.addObjectCreate("Server",
+        //                "org.apache.catalina.core.StandardServer",
+        //                "className");
+
+        // createStartDigester-> addRuleSet
         Digester digester = createStartDigester();
 
         InputSource inputSource = null;

@@ -106,6 +106,7 @@ public abstract class LifecycleBase implements Lifecycle {
             setStateInternal(LifecycleState.INITIALIZING, null, false);
 
             //执行子类的实现，比如stardardSever, StandardService
+            // 首先执行 server -> service .... ->
             initInternal();
 
             setStateInternal(LifecycleState.INITIALIZED, null, false);

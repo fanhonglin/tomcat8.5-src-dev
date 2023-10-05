@@ -347,6 +347,7 @@ public class CoyoteAdapter implements Adapter {
                 // service 获取到engine
                 // 调用 Engine 容器下 pipeline 的阀门，请求处理交由容器
                 // 调用的是 StandardEngineValve
+                // 在初始化service的时候，standardService当中addConnector，绑定了两者之间的关系
                 connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);
             }
             if (request.isAsync()) {
