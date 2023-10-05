@@ -140,7 +140,7 @@ final class StandardHostValve extends ValveBase {
             try {
                 if (!asyncAtStart || asyncDispatching) {
 
-                    // 执行StandardContextValve
+                    // 执行 StandardContextValve
                     context.getPipeline().getFirst().invoke(request, response);
 
                 } else {

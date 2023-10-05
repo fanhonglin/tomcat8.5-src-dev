@@ -122,7 +122,9 @@ final class StandardWrapperValve
         // Allocate a servlet instance to process this request
         try {
             // servlet 第一次使用的时候，加载
+            //  这儿调用Wrapper的allocate()方法分配一个Servlet实例
             if (!unavailable) {
+                // 初始化servlet , servlet.init
                 servlet = wrapper.allocate();
             }
         } catch (UnavailableException e) {
@@ -160,6 +162,8 @@ final class StandardWrapperValve
         request.setAttribute(Globals.DISPATCHER_REQUEST_PATH_ATTR, requestPathMB);
 
         // Create the filter chain for this request
+
+        // 创建过滤器链
         ApplicationFilterChain filterChain = ApplicationFilterFactory.createFilterChain(request, wrapper, servlet);
 
         // Call the filter chain for this request

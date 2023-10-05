@@ -335,7 +335,8 @@ public class CoyoteAdapter implements Adapter {
             // Parse and set Catalina and configuration specific
             // request parameters
 
-            // 处理解析请求
+            // 处理解析请求, req 转换成 request
+            // 处理请求映射 (获取 host, context, wrapper, URI 后面的参数的解析, sessionId )
             postParseSuccess = postParseRequest(req, request, res, response);
 
             if (postParseSuccess) {
@@ -344,6 +345,8 @@ public class CoyoteAdapter implements Adapter {
                 // Calling the container
 
                 // service 获取到engine
+                // 调用 Engine 容器下 pipeline 的阀门，请求处理交由容器
+                // 调用的是 StandardEngineValve
                 connector.getService().getContainer().getPipeline().getFirst().invoke(request, response);
             }
             if (request.isAsync()) {
@@ -373,6 +376,8 @@ public class CoyoteAdapter implements Adapter {
                     request.getAsyncContextInternal().setErrorState(throwable, true);
                 }
             } else {
+
+                // 通过request.finishRequest 与 response.finishResponse(将OutputBuffer中的数据写到浏览器) 来完成整个请求
                 request.finishRequest();
                 response.finishResponse();
             }

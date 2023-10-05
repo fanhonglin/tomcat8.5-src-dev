@@ -664,6 +664,8 @@ public class Http11Processor extends AbstractProcessor {
     @Override
     public SocketState service(SocketWrapperBase<?> socketWrapper)
         throws IOException {
+
+        // request和response初始化的时候就实例化了 ，new AbstractProcessor()
         RequestInfo rp = request.getRequestProcessor();
         rp.setStage(org.apache.coyote.Constants.STAGE_PARSE);
 
@@ -803,8 +805,7 @@ public class Http11Processor extends AbstractProcessor {
 
 
                     // 执行----- adapter.service---------------
-
-
+                    // CoyoteAdapter
                     getAdapter().service(request, response);
 
                     // Handle when the response was committed before a serious

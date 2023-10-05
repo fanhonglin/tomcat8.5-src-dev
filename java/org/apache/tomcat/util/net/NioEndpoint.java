@@ -165,6 +165,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
      * @return The next poller in sequence
      */
     public Poller getPoller0() {
+
+        // pollers 的数量来源于cpu核心数量和2的最小值
+        //   private int pollerThreadCount = Math.min(2, Runtime.getRuntime().availableProcessors());
         int idx = Math.abs(pollerRotater.incrementAndGet()) % pollers.length;
         return pollers[idx];
     }
@@ -406,7 +409,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 channel.reset();
             }
 
-            // 注册到Poller到中，队列当中
+            // 包装成socketWrapper,注册到Poller到中，队列当中
             getPoller0().register(channel);
 
         } catch (Throwable t) {
@@ -471,7 +474,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
                 try {
                     //if we have reached max connections, wait
-                    // 增加一个连接计数，是否达到最大连接
+                    // 增加一个连接计数，是否达到最大连接,默认最大10000
                     countUpOrAwaitConnection();
 
                     SocketChannel socket = null;
@@ -641,6 +644,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
     public class Poller implements Runnable {
 
         private Selector selector;
+
+        // 队列受限于内存的大小，因此tomcat内存需要较大
         private final SynchronizedQueue<PollerEvent> events = new SynchronizedQueue<>();
 
         private volatile boolean close = false;
@@ -674,6 +679,9 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
         }
 
         private void addEvent(PollerEvent event) {
+
+            // 事件队列
+            // SynchronizedQueue<PollerEvent>
             events.offer(event);
             if (wakeupCounter.incrementAndGet() == 0) selector.wakeup();
         }
@@ -855,6 +863,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                 //either we timed out or we woke up, process events first
                 if (keyCount == 0) hasEvents = (hasEvents | events());
 
+                // 获取当前选择器中所有注册的“选择键(已就绪的监听事件)”
                 Iterator<SelectionKey> iterator = keyCount > 0 ? selector.selectedKeys().iterator() : null;
                 // Walk through the collection of ready keys and dispatch
                 // any active event.
@@ -868,7 +877,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                     } else {
                         iterator.remove();
 
-                        // 核心处理
+                        // 真正处理事件的地方，核心处理
+                        // 该方法会根据 key 的类型，来分别处理读操作和写操作
                         processKey(sk, attachment);
                     }
                 }//while
@@ -879,6 +889,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
 
             getStopLatch().countDown();
         }
+
 
         protected void processKey(SelectionKey sk, NioSocketWrapper attachment) {
             try {
@@ -892,6 +903,8 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                             unreg(sk, attachment, sk.readyOps());
                             boolean closeSocket = false;
                             // Read goes before write
+
+                            // 处理读事件，读事件和写事件都需要判断，串行判断
                             if (sk.isReadable()) {
 
                                 // 处理读 AbstractEndpoint
@@ -899,7 +912,7 @@ public class NioEndpoint extends AbstractJsseEndpoint<NioChannel> {
                                     closeSocket = true;
                                 }
                             }
-                            // 处理写
+                            // 处理写事件
                             if (!closeSocket && sk.isWritable()) {
                                 if (!processSocket(attachment, SocketEvent.OPEN_WRITE, true)) {
                                     closeSocket = true;

@@ -864,6 +864,8 @@ public abstract class AbstractEndpoint<S> {
         internalExecutor = true;
         TaskQueue taskqueue = new TaskQueue();
         TaskThreadFactory tf = new TaskThreadFactory(getName() + "-exec-", daemon, getThreadPriority());
+
+        // 默认是10个工作线程，最大是100个， 通过internalExecutor来控制
         executor = new ThreadPoolExecutor(getMinSpareThreads(), getMaxThreads(), 60, TimeUnit.SECONDS, taskqueue, tf);
         taskqueue.setParent((ThreadPoolExecutor) executor);
     }
@@ -1039,13 +1041,14 @@ public abstract class AbstractEndpoint<S> {
                 return false;
             }
 
-            // 创建 SocketProcessor
+            // 创建 SocketProcessor， SocketProcessorBase
             SocketProcessorBase<S> sc = processorCache.pop();
             if (sc == null) {
                 sc = createSocketProcessor(socketWrapper, event);
             } else {
                 sc.reset(socketWrapper, event);
             }
+            // 获取线程处理，默认最小10个，最大200个
             Executor executor = getExecutor();
             if (dispatch && executor != null) {
                 executor.execute(sc);

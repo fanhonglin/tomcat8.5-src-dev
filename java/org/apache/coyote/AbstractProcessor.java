@@ -68,7 +68,11 @@ public abstract class AbstractProcessor extends AbstractProcessorLight implement
             Response coyoteResponse) {
         this.endpoint = endpoint;
         asyncStateMachine = new AsyncStateMachine(this);
+
+        // 创建coyoteRequest
         request = coyoteRequest;
+
+        // 创建coyoteResponse
         response = coyoteResponse;
         response.setHook(this);
         request.setResponse(response);

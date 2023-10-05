@@ -763,6 +763,8 @@ public class StandardWrapper extends ContainerBase
                             throw new ServletException(sm.getString("standardWrapper.allocate"), e);
                         }
                     }
+
+                    // 初始化servlet 调用servlet.init方法
                     if (!instanceInitialized) {
                         initServlet(instance);
                     }
